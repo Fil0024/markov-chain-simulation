@@ -15,6 +15,8 @@ class MetropolisSimulation:
         self.temp = config.INITIAL_TEMP
         
         self.energy_history = []
+        self.conformation_history = []  # <<< NOWOŚĆ: Lista do przechowywania klatek
+        
         self.accepted_moves = {'end': 0, 'corner': 0, 'crankshaft': 0}
         self.proposed_moves = {'end': 0, 'corner': 0, 'crankshaft': 0}
 
@@ -22,10 +24,13 @@ class MetropolisSimulation:
         """Uruchamia główną pętlę symulacji."""
         print(f"Rozpoczynanie symulacji dla {config.NUM_STEPS} kroków...")
         
+        # Zapisz klatkę początkową
+        if config.CREATE_ANIMATION:
+            self.conformation_history.append(self.protein.coords.copy())
+
         for step in tqdm(range(config.NUM_STEPS), desc="Symulacja"):
             current_energy = self.protein.energy
             
-            # Wybór losowego ruchu do wykonania
             move_type = random.choice(['end', 'corner', 'crankshaft'])
             self.proposed_moves[move_type] += 1
             
@@ -38,20 +43,20 @@ class MetropolisSimulation:
                 new_coords = self.protein.try_crankshaft_move()
 
             if new_coords is not None:
-                # Oblicz energię nowej konformacji
                 temp_protein = self.protein.get_updated_copy(new_coords)
                 new_energy = temp_protein.energy
-                
                 delta_e = new_energy - current_energy
                 
-                # Kryterium akceptacji Metropolisa
                 if delta_e < 0 or random.random() < math.exp(-delta_e / self.temp):
-                    self.protein = temp_protein # Zaakceptuj ruch
+                    self.protein = temp_protein
                     self.accepted_moves[move_type] += 1
             
             self.energy_history.append(self.protein.energy)
             
-            # Aktualizacja temperatury (symulowane wyżarzanie)
+            # <<< NOWOŚĆ: Zapisywanie klatki co N kroków
+            if config.CREATE_ANIMATION and (step + 1) % config.ANIMATION_FRAME_INTERVAL == 0:
+                self.conformation_history.append(self.protein.coords.copy())
+
             self.temp = max(config.FINAL_TEMP, self.temp * config.ALPHA)
             
         print("Symulacja zakończona.")
