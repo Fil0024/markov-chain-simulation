@@ -1,0 +1,61 @@
+# simulation.py
+import math
+import random
+from tqdm import tqdm
+from protein import Protein
+import config
+
+class MetropolisSimulation:
+    """
+    Zarządza symulacją zwijania białek za pomocą algorytmu Metropolisa
+    i symulowanego wyżarzania.
+    """
+    def __init__(self, protein: Protein):
+        self.protein = protein
+        self.temp = config.INITIAL_TEMP
+        
+        self.energy_history = []
+        self.accepted_moves = {'end': 0, 'corner': 0, 'crankshaft': 0}
+        self.proposed_moves = {'end': 0, 'corner': 0, 'crankshaft': 0}
+
+    def run(self):
+        """Uruchamia główną pętlę symulacji."""
+        print(f"Rozpoczynanie symulacji dla {config.NUM_STEPS} kroków...")
+        
+        for step in tqdm(range(config.NUM_STEPS), desc="Symulacja"):
+            current_energy = self.protein.energy
+            
+            # Wybór losowego ruchu do wykonania
+            move_type = random.choice(['end', 'corner', 'crankshaft'])
+            self.proposed_moves[move_type] += 1
+            
+            new_coords = None
+            if move_type == 'end':
+                new_coords = self.protein.try_end_move()
+            elif move_type == 'corner':
+                new_coords = self.protein.try_corner_move()
+            elif move_type == 'crankshaft':
+                new_coords = self.protein.try_crankshaft_move()
+
+            if new_coords is not None:
+                # Oblicz energię nowej konformacji
+                temp_protein = self.protein.get_updated_copy(new_coords)
+                new_energy = temp_protein.energy
+                
+                delta_e = new_energy - current_energy
+                
+                # Kryterium akceptacji Metropolisa
+                if delta_e < 0 or random.random() < math.exp(-delta_e / self.temp):
+                    self.protein = temp_protein # Zaakceptuj ruch
+                    self.accepted_moves[move_type] += 1
+            
+            self.energy_history.append(self.protein.energy)
+            
+            # Aktualizacja temperatury (symulowane wyżarzanie)
+            self.temp = max(config.FINAL_TEMP, self.temp * config.ALPHA)
+            
+        print("Symulacja zakończona.")
+        print(f"Końcowa energia: {self.protein.energy}")
+        print(f"Statystyki ruchów (proponowane / zaakceptowane):")
+        for move in self.proposed_moves:
+            print(f" - {move.capitalize()}: {self.proposed_moves[move]} / {self.accepted_moves[move]}")
