@@ -76,13 +76,13 @@ class Protein:
             np.array([0, 1, 0]), np.array([0, -1, 0]),
             np.array([0, 0, 1]), np.array([0, 0, -1]),
         ]
-        move = random.choice(directions)
+        move = random.shuffle(directions)
         
-        new_pos = pivot_pos + move
-        if not any(np.array_equal(new_pos, c) for c in np.delete(new_coords, end_idx, axis=0)):
-            new_coords[end_idx] = new_pos
-            return new_coords
-        
+        for move in directions:
+            new_pos = pivot_pos + move
+            if not any(np.array_equal(new_pos, c) for c in np.delete(new_coords, end_idx, axis=0)):
+                new_coords[end_idx] = new_pos
+                return new_coords
         return None
 
     def try_corner_move(self) -> np.ndarray | None:

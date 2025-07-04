@@ -31,23 +31,25 @@ class MetropolisSimulation:
         for step in tqdm(range(config.NUM_STEPS), desc="Symulacja"):
             current_energy = self.protein.energy
             
-            move_type = random.choice(['end', 'corner', 'crankshaft'])
-            self.proposed_moves[move_type] += 1
             
             new_coords = None
-            if move_type == 'end':
-                new_coords = self.protein.try_end_move()
-            elif move_type == 'corner':
-                new_coords = self.protein.try_corner_move()
-            elif move_type == 'crankshaft':
-                new_coords = self.protein.try_crankshaft_move()
+            while new_coords is None:
+                move_type = random.choice(['end', 'corner', 'crankshaft'])
+                if move_type == 'end':
+                    new_coords = self.protein.try_end_move()
+                elif move_type == 'corner':
+                    new_coords = self.protein.try_corner_move()
+                elif move_type == 'crankshaft':
+                    new_coords = self.protein.try_crankshaft_move()
+
+            self.proposed_moves[move_type] += 1
 
             if new_coords is not None:
                 temp_protein = self.protein.get_updated_copy(new_coords)
                 new_energy = temp_protein.energy
                 delta_e = new_energy - current_energy
                 
-                if delta_e < 0 or random.random() < math.exp(-delta_e / self.temp):
+                if delta_e <= 0 or random.random() < math.exp(-delta_e / self.temp):
                     self.protein = temp_protein
                     self.accepted_moves[move_type] += 1
             
