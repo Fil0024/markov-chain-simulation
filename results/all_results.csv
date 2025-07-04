@@ -1,0 +1,2 @@
+initialization_method,initial_temp,final_temp,alpha,num_steps,initial_energy,final_energyrandom
+random,1,0.1,0.999,10000,-6,-18

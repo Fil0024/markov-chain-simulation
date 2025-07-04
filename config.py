@@ -15,6 +15,6 @@ INITIALIZATION_METHOD = 'random'
 
 # --- Parametry animacji ---
 # Czy tworzyć animację procesu zwijania?
-CREATE_ANIMATION = False
+CREATE_ANIMATION = True
 # Zapisuj klatkę animacji co N kroków
 ANIMATION_FRAME_INTERVAL = 100
