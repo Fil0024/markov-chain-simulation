@@ -55,7 +55,7 @@ class MetropolisSimulation:
             
             self.energy_history.append(self.protein.energy)
             
-            # <<< NOWOŚĆ: Zapisywanie klatki co N kroków
+            # Zapisywanie klatki co N kroków
             if config.CREATE_ANIMATION and (step + 1) % config.ANIMATION_FRAME_INTERVAL == 0:
                 self.conformation_history.append(self.protein.coords.copy())
 

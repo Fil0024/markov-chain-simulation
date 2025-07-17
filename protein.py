@@ -1,6 +1,9 @@
 # protein.py
 import random
 import numpy as np
+import config
+import sys
+import os
 
 class Protein:
     """
@@ -15,6 +18,8 @@ class Protein:
             self._initialize_linear()
         elif init_method == 'random':
             self._initialize_random_walk()
+        elif init_method == 'seed':
+            self._initialize_with_seed()
         else:
             raise ValueError("Nieznana metoda inicjalizacji. Wybierz 'linear' lub 'random'.")
 
@@ -44,6 +49,41 @@ class Protein:
                 print("Ostrzeżenie: losowe błądzenie utknęło, próba ponowna.")
                 self.__init__(self.sequence, 'random')
                 return
+            
+    def _initialize_with_seed(self):
+        try:
+            seed_path = os.path.join(os.path.dirname(__file__), "results", config.SEED_TIMEID, "final_conformation.txt")
+            with open(seed_path, 'r') as f:
+                lines = f.readlines()
+                # Sprawdź, czy liczba wierszy w pliku odpowiada długości łańcucha
+                if len(lines) != self.length:
+                    print(f"Ostrzeżenie: Długość łańcucha ({self.length}) nie zgadza się "
+                            f"z liczbą wierszy w pliku seed ({len(lines)}).")
+                    # Możesz tutaj dodać obsługę tego błędu, np. przerwać działanie
+                    # lub dostosować długość łańcucha.
+                    # W tym przykładzie, współrzędne zostaną wczytane,
+                    # ale mogą być niekompletne lub nadmiarowe.
+
+                read_coords = []
+                for line in lines:
+                    parts = line.strip().split()
+                    if len(parts) == 3:
+                        try:
+                            # Konwertuj każdą część na liczbę całkowitą i dodaj do listy
+                            read_coords.append([int(p) for p in parts])
+                        except ValueError:
+                            print(f"Ostrzeżenie: Pomięto nieprawidłową linię w pliku seed: {line.strip()}")
+                
+                # Ustaw współrzędne obiektu na podstawie wczytanych danych
+                self.coords = np.array(read_coords, dtype=int)
+
+        except FileNotFoundError:
+            print(f"Błąd: Nie znaleziono pliku pod ścieżką: {config.SEED_PATH}")
+            sys.exit("Program nie może kontynuować bez pliku seed.")
+        except Exception as e:
+            print(f"Wystąpił nieoczekiwany błąd podczas wczytywania pliku seed: {e}")
+            sys.exit()
+
 
     def calculate_energy(self) -> int:
         energy = 0

@@ -1,0 +1,14 @@
+Parametry symulacji:
+Metoda inicjalizacji: seed
+Temperatura poczatkowa: 2
+Temperatura koncowa: 0.5
+Wspolczynnik schladzania alpha: 0.999
+Liczba krokow: 10000
+Energia poczatkowa: -21
+Energia koncowa: -19
+Statystyki ruchow (proponowane / zaakceptowane):
+ End: 3977 / 3977
+ Corner: 2038 / 1456
+ Crankshaft: 3985 / 3985
+ All moves: 10000 / 9418
+Plik z konformacj¹ pocz¹tkow¹: 20250717-211342

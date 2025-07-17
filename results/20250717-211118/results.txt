@@ -1,0 +1,13 @@
+Parametry symulacji:
+Metoda inicjalizacji: random
+Temperatura poczatkowa: 2
+Temperatura koncowa: 0.5
+Wspolczynnik schladzania alpha: 0.999
+Liczba krokow: 10000
+Energia poczatkowa: -4
+Energia koncowa: -15
+Statystyki ruchow (proponowane / zaakceptowane):
+ End: 3890 / 3890
+ Corner: 2183 / 1769
+ Crankshaft: 3927 / 3927
+ All moves: 10000 / 9586
